@@ -12,13 +12,13 @@
                 <div class="card-body">
                     <!-- <h3 class="card-title custom-header">Students List</h3> -->
                     <h2 class="text-center mb-3 fw-bold text-success">STUDENT LISTS</h2>
-                    <table class="table table-bordered">
+                    <table class="table table-bordered table-striped">
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Age</th>
-                                <th>Course</th>
+                            <tr class="bg-success text-white">
+                                <th class="py-2">ID</th>
+                                <th class="py-2">Name</th>
+                                <th class="py-2">Age</th>
+                                <th class="py-2">Course</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -9,9 +9,7 @@
             <div class="card mt-5 shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center bg-success text-white">
                     <h4 class="mb-0"><i class="bi bi-speedometer2"></i> Dashboard</h4>
-                    <a href="{{ route('logout') }}" class="btn btn-sm btn-outline-light">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </a>
+                    
                 </div>
                 <div class="card-body">
                     @if(session('success'))
