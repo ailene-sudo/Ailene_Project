@@ -12,6 +12,7 @@
             <p><strong>Last Name:</strong> {{ $student->lname }}</p>
             <p><strong>Address:</strong> {{ $student->address }}</p>
             <p><strong>Contact Number:</strong> {{ $student->contactno }}</p>
+            <p><strong>Email:</strong> {{ $student->email }}</p>
         </div>
         <a href="{{ route('students.index') }}" class="btn btn-secondary">Back to List</a>
     </div>

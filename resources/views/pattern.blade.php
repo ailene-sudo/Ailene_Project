@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layout')
 
 @section('title', 'Contact Us')
 <!-- <h2>Pattern Generator</h2> --> <h2 class="text-center mb-3 fw-bold text-success">PATTERN</h2>

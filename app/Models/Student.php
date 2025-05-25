@@ -16,5 +16,7 @@ class Student extends Model
         'lname',
         'address',
         'contactno',
+        'image_path',
+        'email',
     ];
 }

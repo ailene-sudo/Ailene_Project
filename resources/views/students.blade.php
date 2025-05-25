@@ -1,62 +1,109 @@
 @extends('layout')
 
+@section('title', 'Students')
+
 @section('content')
-<div class="container py-5">
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-success fw-bold">Students List</h1>
+        <a href="{{ route('students.create') }}" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i>Add New Student
+        </a>
+    </div>
 
     @if(session('message'))
-        <div class="alert alert-success text-center fw-semibold">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('message') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
-    <h1 class="text-center mb-4 fw-bold text-success">Student Information</h1>
-
-    <div class="table-container my-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <!-- <h5 class="mb-0 text-muted">Manage student records</h5> -->
-            <a href="{{ route('students.create') }}" class="btn btn-success shadow-sm">+ Add New Student</a>
+    @if(session('password_message'))
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ session('password_message') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    @endif
 
-        <div class="table-responsive shadow-sm rounded">
-            <table class="table table-bordered table-hover align-middle mb-0">
-                <thead class="table-success">
-                    <tr>
-                        <th scope="col" style="color: darkgreen;">Student ID</th>
-                        <th scope="col" style="color: darkgreen;">First Name</th>
-                        <th scope="col" style="color: darkgreen;">Middle Name</th>
-                        <th scope="col" style="color: darkgreen;">Last Name</th>
-                        <th scope="col" style="color: darkgreen;">Address</th>
-                        <th scope="col" style="color: darkgreen;">Contact Number</th>
-                        <th scope="col" class="text-center" style="color: darkgreen;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($students as $stud)
-                        <tr>
-                            <td>{{ $stud->studentid }}</td>
-                            <td>{{ $stud->fname }}</td>
-                            <td>{{ $stud->mname }}</td>
-                            <td>{{ $stud->lname }}</td>
-                            <td>{{ $stud->address }}</td>
-                            <td>{{ $stud->contactno }}</td>
-                            <td class="text-center">
-                                <a href="{{ route('students.show', $stud->id) }}" class="btn btn-sm btn-info text-white me-1">View</a>
-                                <a href="{{ route('students.edit', $stud->id) }}" class="btn btn-sm btn-warning me-1">Edit</a>
-                                <form action="{{ route('students.destroy', $stud->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this student?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                            </td>
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="bg-success text-white">
+                            <th class="py-3">Image</th>
+                            <th class="py-3">Student ID</th>
+                            <th class="py-3">Name</th>
+                            <th class="py-3">Address</th>
+                            <th class="py-3">Contact No</th>
+                            <th class="py-3">Email</th>
+                            <th class="py-3">Actions</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($students as $student)
+                            <tr>
+                                <td class="align-middle" style="width: 100px;">
+                                    @if($student->image_path)
+                                        <img src="{{ asset('storage/' . $student->image_path) }}" 
+                                             alt="Student Image" 
+                                             class="img-thumbnail"
+                                             style="width: 80px; height: 80px; object-fit: cover;">
+                                    @else
+                                        <div class="bg-light d-flex align-items-center justify-content-center" 
+                                             style="width: 80px; height: 80px;">
+                                            <i class="bi bi-person-circle text-secondary" style="font-size: 2rem;"></i>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="align-middle fw-bold text-success">{{ $student->studentid }}</td>
+                                <td class="align-middle">
+                                    {{ $student->fname }} 
+                                    {{ $student->mname ? $student->mname . ' ' : '' }}
+                                    {{ $student->lname }}
+                                </td>
+                                <td class="align-middle">{{ $student->address }}</td>
+                                <td class="align-middle">{{ $student->contactno }}</td>
+                                <td class="align-middle">{{ $student->email }}</td>
+                                <td class="align-middle">
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('students.show', $student->id) }}" 
+                                           class="btn btn-info btn-sm text-white">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ route('students.edit', $student->id) }}" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form action="{{ route('students.destroy', $student->id) }}" 
+                                              method="POST" 
+                                              class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this student?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
+    </div>
 
-        <div class="mt-4 d-flex justify-content-center">
-            {{ $students->links() }}
-        </div>
+    <div class="d-flex justify-content-center mt-4">
+        {{ $students->links() }}
     </div>
 </div>
 @endsection

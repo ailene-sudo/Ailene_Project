@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->String('studentid');
-            $table->String('fname');
-            $table->String('mname');
-            $table->String('lname');
-            $table->String('address');
-            $table->Integer('contactno');
+            $table->string('studentid');
+            $table->string('fname');
+            $table->string('mname')->nullable();
+            $table->string('lname');
+            $table->string('address');
+            $table->string('contactno', 20); // Changed to string to handle phone numbers
+            $table->string('image_path')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
         });
     }

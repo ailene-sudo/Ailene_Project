@@ -1,4 +1,4 @@
-@extends('layout.layout1')
+@extends('layout')
 
 @section('title', 'Add Student')
 
@@ -14,22 +14,25 @@
             </div>
         @endif
 
-        <form action="{{ route('students.store') }}" method="POST">
+        <form action="{{ route('students.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            {{-- Student ID --}}
-            <div class="form-group mb-3">
-                <label for="studentid">Student ID</label>
-                <input type="text" name="studentid" id="studentid" class="form-control" value="{{ old('studentid') }}" autofocus>
-                @error('studentid')
+            {{-- Student Image --}}
+            <div class="form-group mb-4">
+                <label for="image">Student Image</label>
+                <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                @error('image')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
+                <div id="imagePreview" class="mt-2 text-center" style="display: none;">
+                    <img src="" alt="Preview" style="max-width: 200px; max-height: 200px;" class="img-thumbnail">
+                </div>
             </div>
 
             {{-- First Name --}}
             <div class="form-group mb-3">
                 <label for="fname">First Name</label>
-                <input type="text" name="fname" id="fname" class="form-control" value="{{ old('fname') }}">
+                <input type="text" name="fname" id="fname" class="form-control" value="{{ old('fname') }}" autofocus>
                 @error('fname')
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
@@ -71,6 +74,15 @@
                 @enderror
             </div>
 
+            {{-- Email --}}
+            <div class="form-group mb-4">
+                <label for="email">Email Address</label>
+                <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}">
+                @error('email')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+
             {{-- Submit + Cancel --}}
             <div class="form-group text-center">
                 <button type="submit" class="btn btn-success">Add Student</button>
@@ -79,4 +91,25 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.getElementById('image').addEventListener('change', function(e) {
+        const preview = document.getElementById('imagePreview');
+        const img = preview.querySelector('img');
+        const file = e.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
+    });
+</script>
+@endpush
 @endsection

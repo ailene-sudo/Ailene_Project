@@ -1,4 +1,4 @@
-@extends('layout.layout1') <!-- Use your layout -->
+@extends('layout') <!-- Use your layout -->
 
 @section('title', 'Student List and Grade Calculation')
 
