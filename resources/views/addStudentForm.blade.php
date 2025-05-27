@@ -3,8 +3,10 @@
 @section('title', 'Add Student')
 
 @section('content')
-<div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
-    <div class="card p-4 w-50">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card p-4 shadow-sm">
         <h1 class="text-center mb-4">Add Student</h1>
 
         {{-- Display Session Message (Optional) --}}
@@ -89,6 +91,8 @@
                 <a href="{{ route('students.index') }}" class="btn btn-secondary ms-2">Cancel</a>
             </div>
         </form>
+            </div>
+        </div>
     </div>
 </div>
 

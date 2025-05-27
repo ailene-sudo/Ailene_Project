@@ -101,6 +101,13 @@
                                                 <div class="small text-muted">Manage system user accounts</div>
                                             </div>
                                         </a>
+                                        <a href="{{ route('admin.users.create') }}" class="list-group-item list-group-item-action d-flex align-items-center">
+                                            <i class="bi bi-person-plus me-3 text-success"></i>
+                                            <div>
+                                                <strong>Register New Account</strong>
+                                                <div class="small text-muted">Create a new user account</div>
+                                            </div>
+                                        </a>
                                     </div>
                                 </div>
                             </div>

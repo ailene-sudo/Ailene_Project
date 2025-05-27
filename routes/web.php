@@ -17,9 +17,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Registration Routes (directly accessible without layout wrapper)
-Route::get('/register', [UserAccountController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [UserAccountController::class, 'register'])->name('register.submit');
+// Registration Routes moved to protected routes
 
 // Password Update Routes
 Route::get('/update-password', [UserAccountController::class, 'showUpdatePasswordForm'])->name('password.update');
@@ -35,6 +33,9 @@ Route::middleware([SessionUserAccountMW::class])->group(function () {
         Route::get('/users', [UserAccountController::class, 'index'])->name('admin.users');
         Route::get('/users/create', [UserAccountController::class, 'create'])->name('admin.users.create');
         Route::post('/users', [UserAccountController::class, 'store'])->name('admin.users.store');
+        Route::get('/users/{id}/edit', [UserAccountController::class, 'edit'])->name('admin.users.edit');
+        Route::put('/users/{id}', [UserAccountController::class, 'update'])->name('admin.users.update');
+        Route::delete('/users/{id}', [UserAccountController::class, 'destroy'])->name('admin.users.destroy');
     });
     
     // Moving all other routes inside the protected middleware group

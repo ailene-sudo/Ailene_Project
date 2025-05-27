@@ -12,7 +12,7 @@
             font-family: 'Open Sans', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
+            background-color: #f9f9fa;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -20,6 +20,9 @@
 
         header {
             background-color: #1e4620;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
         }
 
         .navbar-custom {
@@ -38,81 +41,88 @@
             margin-right: 17px;
         }
 
-        #navbarLinks {
-            display: flex;
-            align-items: center;
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: calc(100% - 60px);
+            width: 240px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 20px 0;
+            z-index: 900;
+            overflow-y: auto;
         }
 
-        .navbar-links a {
-            color: #ffffff;
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin: 5px 15px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: #495057;
             text-decoration: none;
-            padding: 8px 14px;
-            margin: 0 5px;
-            border-radius: 4px;
-            transition: background 0.3s ease;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a i {
+            margin-right: 12px;
+            font-size: 18px;
+            color: #1e4620;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: #e9ecef;
+        }
+
+        .sidebar-nav a.active {
+            background-color: #e8f5e9;
+            color: #1e4620;
+            font-weight: 500;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background-color: #dee2e6;
+            margin: 15px;
+        }
+
+        .sidebar-header {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #6c757d;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 0 15px;
+            margin: 15px 15px 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 240px;
+            padding-top: 80px;
+            min-height: 100vh;
             display: flex;
-            align-items: center;
-            font-size: 16px;
+            flex-direction: column;
         }
 
-        .navbar-links a i {
-            margin-right: 6px;
-            font-size: 16px;
-        }
-
-        .navbar-links a:hover {
-            background-color: #388e3c;
-        }
-
-        .navbar-links .active {
-            background-color: #388e3c;
-        }
-
-        .logout-btn {
-            padding: 8px 14px;
-            color: #ffffff;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border-radius: 4px;
-            transition: background 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background-color: #388e3c;
-            color: #ffffff;
-        }
-
-        .user-badge {
-            padding: 8px 14px;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .user-badge i {
-            margin-right: 5px;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 25px;
+        .content-container {
+            flex: 1;
+            padding: 20px;
             background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            flex-grow: 1;
-        }
-
-        .footer {
-            background-color: #1e4620;
-            color: white;
-            text-align: center;
-            padding: 15px 0;
-            margin-top: auto;
-            font-size: 14px;
+            margin: 0 20px 20px 20px;
         }
 
         table {
@@ -152,59 +162,27 @@
             margin-bottom: 25px;
         }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            font-size: 16px;
+        .footer {
+            background-color: #1e4620;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: auto;
+            font-size: 14px;
         }
 
-        /* Mobile navbar toggle */
+        /* Mobile styles */
         @media screen and (max-width: 768px) {
-            .navbar-custom {
-                flex-wrap: wrap;
+            .sidebar {
+                transform: translateX(-100%);
             }
             
-            .navbar-links {
-                display: none;
-                flex-direction: column;
-                width: 100%;
-                margin-top: 10px;
-            }
-
-            .navbar-links.active {
-                display: flex;
-            }
-
-            .navbar-toggle {
-                font-size: 26px;
-                color: white;
-                background: none;
-                border: none;
-                cursor: pointer;
-            }
-
-            .nav-right {
-                display: none;
-                flex-direction: column;
-                align-items: flex-start;
-                margin-top: 10px;
-                width: 100%;
+            .sidebar.show {
+                transform: translateX(0);
             }
             
-            .nav-right.active {
-                display: flex;
-            }
-            
-            .user-badge {
-                margin: 10px 0;
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .logout-btn {
-                margin: 0;
-                width: 100%;
-                justify-content: center;
+            .main-content {
+                margin-left: 0;
             }
         }
     </style>
@@ -214,67 +192,126 @@
     @section('navbar')
     <header>
         <div class="navbar-custom">
-            <div class="navbar-title">Aster's Website</div>
-            <div class="navbar-links d-none d-md-flex" id="navbarLinks">
-                @if(session()->has('username'))
-                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-                @endif
-                <a href="{{ url('/profile') }}" class="{{ request()->is('profile') ? 'active' : '' }}">
-                    <i class="bi bi-person"></i> Profile
-                </a>
-                <a href="{{ url('/aboutus') }}" class="{{ request()->is('aboutus') ? 'active' : '' }}">
-                    <i class="bi bi-info-circle"></i> About Us
-                </a>
-                <a href="{{ url('/contactus') }}" class="{{ request()->is('contactus') ? 'active' : '' }}">
-                    <i class="bi bi-envelope"></i> Contact Us
-                </a>
-                <a href="{{ url('/conditional') }}" class="{{ request()->is('conditional') ? 'active' : '' }}">
-                    <i class="bi bi-code-slash"></i> Conditional
-                </a>
-                <a href="{{ route('students.index') }}" class="{{ request()->routeIs('students.index') ? 'active' : '' }}">
-                    <i class="bi bi-mortarboard"></i> Students
-                </a>
+            <div class="navbar-title"><i class="bi bi-flower1 me-2"></i>Aster's Website</div>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-sm btn-outline-light d-md-none ms-2" id="mobileSidebarToggle">
+                    <i class="bi bi-list"></i>
+                </button>
             </div>
-            <button class="navbar-toggle d-md-none" onclick="toggleNavbar()">☰</button>
-            @if(session()->has('username'))
-            <div class="nav-right d-none d-md-flex">
-                <a href="{{ route('logout') }}" class="logout-btn">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-            </div>
-            @endif
         </div>
     </header>
     @show
 
-    <!-- Main Content -->
-    <div class="container">
-        @yield('content')
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <ul class="sidebar-nav">
+            <div class="sidebar-header">MAIN NAVIGATION</div>
+            
+            @if(session()->has('username'))
+            <li>
+                <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <i class="bi bi-speedometer2"></i>
+                    Dashboard
+                </a>
+            </li>
+            @endif
+            
+            <li>
+                <a href="{{ route('students.index') }}" class="{{ request()->routeIs('students.index') ? 'active' : '' }}">
+                    <i class="bi bi-mortarboard"></i>
+                    Students
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ url('/conditional') }}" class="{{ request()->is('conditional') ? 'active' : '' }}">
+                    <i class="bi bi-code-slash"></i>
+                    Conditional
+                </a>
+            </li>
+            
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-header">INFORMATION</div>
+            
+            <li>
+                <a href="{{ url('/profile') }}" class="{{ request()->is('profile') ? 'active' : '' }}">
+                    <i class="bi bi-person"></i>
+                    Profile
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ url('/aboutus') }}" class="{{ request()->is('aboutus') ? 'active' : '' }}">
+                    <i class="bi bi-info-circle"></i>
+                    About Us
+                </a>
+            </li>
+            
+            <li>
+                <a href="{{ url('/contactus') }}" class="{{ request()->is('contactus') ? 'active' : '' }}">
+                    <i class="bi bi-envelope"></i>
+                    Contact Us
+                </a>
+            </li>
+            
+            @if(session()->has('username'))
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-header">ADMINISTRATION</div>
+            
+            <li>
+                <a href="{{ route('admin.users') }}" class="{{ request()->routeIs('admin.users') ? 'active' : '' }}">
+                    <i class="bi bi-people"></i>
+                    User Management
+                </a>
+            </li>
+            
+            <li class="mt-2 mb-5">
+                <a href="{{ route('logout') }}" style="background-color: #dc3545; color: white; font-weight: bold; font-size: 16px; padding: 12px 15px;">
+                    <i class="bi bi-box-arrow-right" style="color: white;"></i>
+                    Logout
+                </a>
+            </li>
+            @endif
+        </ul>
     </div>
 
-    <!-- Footer -->
-    @section('footer')
-    <footer class="footer">
-        <p>© 2025 Aster's Website. All rights reserved.</p>
-    </footer>
-    @show
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="content-container">
+            @yield('content')
+        </div>
+
+        <!-- Footer -->
+        @section('footer')
+        <footer class="footer">
+            <p>© 2025 Aster's Website. All rights reserved.</p>
+        </footer>
+        @show
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function toggleNavbar() {
-            const links = document.getElementById('navbarLinks');
-            links.classList.toggle('d-none');
-            links.classList.toggle('active');
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
             
-            // Also toggle the user options on mobile if user is logged in
-            const navRight = document.querySelector('.nav-right');
-            if (navRight) {
-                navRight.classList.toggle('d-none');
-                navRight.classList.toggle('active');
+            // Mobile sidebar toggle
+            if (mobileSidebarToggle) {
+                mobileSidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                });
             }
-        }
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                const isMobile = window.innerWidth < 768;
+                if (isMobile && !sidebar.contains(event.target) && 
+                    event.target !== mobileSidebarToggle && 
+                    !mobileSidebarToggle.contains(event.target)) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        });
     </script>
 </body>
 </html>

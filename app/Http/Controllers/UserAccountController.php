@@ -26,11 +26,12 @@ class UserAccountController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|unique:user_accounts,username|min:4',
+            'username' => 'required|string|unique:user_accounts,username|min:4|max:50',
         ], [
             'username.required' => 'Username is required',
             'username.unique' => 'This username is already taken',
             'username.min' => 'Username must be at least 4 characters',
+            'username.max' => 'Username cannot exceed 50 characters',
         ]);
 
         // Default password
@@ -68,11 +69,16 @@ class UserAccountController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|unique:user_accounts,username|min:4',
+            'username' => 'required|string|unique:user_accounts,username|min:4|max:50',
+            'fname' => 'required|string',
+            'lname' => 'required|string',
         ], [
             'username.required' => 'A username is required',
             'username.unique' => 'This username is already taken',
-            'username.min' => 'Username must be at least 4 characters'
+            'username.min' => 'Username must be at least 4 characters',
+            'username.max' => 'Username cannot exceed 50 characters',
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
         ]);
 
         // Use fixed default password "changepass123"
@@ -84,9 +90,36 @@ class UserAccountController extends Controller
             'password' => Hash::make($defaultPassword),
             'defaultpassword' => true,
         ]);
+        
+        // Generate a student ID (S-YY-sequence)
+        $year = date('y'); // Current year (2 digits)
+        $latestStudent = Student::where('studentid', 'like', "S-{$year}-%")
+            ->orderBy('id', 'desc')
+            ->first();
+            
+        $sequence = 1;
+        if ($latestStudent) {
+            $parts = explode('-', $latestStudent->studentid);
+            if (count($parts) == 3) {
+                $sequence = intval($parts[2]) + 1;
+            }
+        }
+        
+        $studentId = "S-{$year}-{$sequence}";
+        
+        // Create a corresponding student record
+        Student::create([
+            'studentid' => $studentId,
+            'fname' => $request->fname,
+            'lname' => $request->lname,
+            'email' => $request->username, // Use username as email
+            'address' => 'Not provided', // Default address
+            'contactno' => 'Not provided', // Default contact number
+            'mname' => '', // Empty middle name
+        ]);
 
         return redirect()->route('admin.users')
-            ->with('success', "User {$request->username} created with default password: {$defaultPassword}");
+            ->with('success', "User {$request->username} created with default password: {$defaultPassword} and added to student list with ID: {$studentId}");
     }
 
     /**
@@ -94,8 +127,69 @@ class UserAccountController extends Controller
      */
     public function index()
     {
-        $users = UserAccount::all();
+        $users = UserAccount::paginate(10); // Show 10 users per page
         return view('user_accounts.index', compact('users'));
+    }
+    
+    /**
+     * Show form to edit a user account
+     */
+    public function edit($id)
+    {
+        $user = UserAccount::findOrFail($id);
+        $student = Student::where('email', $user->username)->first();
+        return view('user_accounts.edit', compact('user', 'student'));
+    }
+    
+    /**
+     * Update a user account
+     */
+    public function update(Request $request, $id)
+    {
+        $user = UserAccount::findOrFail($id);
+        
+        $request->validate([
+            'username' => 'required|string|min:4|max:50|unique:user_accounts,username,'.$id,
+            'fname' => 'required|string',
+            'lname' => 'required|string',
+        ]);
+        
+        // Update user account
+        $user->username = $request->username;
+        $user->save();
+        
+        // Update associated student record
+        $student = Student::where('email', $user->username)->first();
+        if ($student) {
+            $student->fname = $request->fname;
+            $student->lname = $request->lname;
+            $student->email = $request->username;
+            $student->save();
+        }
+        
+        return redirect()->route('admin.users')
+            ->with('success', 'User account updated successfully');
+    }
+    
+    /**
+     * Delete a user account
+     */
+    public function destroy($id)
+    {
+        $user = UserAccount::findOrFail($id);
+        $username = $user->username;
+        
+        // Delete associated student record
+        $student = Student::where('email', $user->username)->first();
+        if ($student) {
+            $student->delete();
+        }
+        
+        // Delete user account
+        $user->delete();
+        
+        return redirect()->route('admin.users')
+            ->with('success', "User account '{$username}' has been deleted");
     }
 
     /**

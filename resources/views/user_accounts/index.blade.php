@@ -113,7 +113,7 @@
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="text-dark">
                                     @foreach($users as $user)
                                         <tr class="user-row {{ $user->defaultpassword ? 'default-password' : 'custom-password' }}">
                                             <td>{{ $user->id }}</td>
@@ -134,8 +134,14 @@
                                                     <button type="button" class="btn btn-outline-primary" title="View Details" onclick="viewUserDetails({{ $user->id }})">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
+                                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-outline-info" title="Edit User">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
                                                     <button type="button" class="btn btn-outline-warning" title="Reset Password" onclick="resetPassword({{ $user->id }})">
                                                         <i class="bi bi-key"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-danger" title="Delete User" onclick="deleteUser({{ $user->id }})">
+                                                        <i class="bi bi-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
@@ -143,6 +149,10 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $users->links() }}
                         </div>
                     @else
                         <div class="alert alert-info">
@@ -163,7 +173,7 @@
                 <h5 class="modal-title">User Details</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body text-dark">
                 <div id="userDetailContent">
                     <!-- Content will be loaded here -->
                 </div>
@@ -216,7 +226,17 @@
     
     // Mock functions for the buttons (would need to be implemented with actual AJAX calls)
     function viewUserDetails(userId) {
-        // In a real app, this would fetch user details via AJAX
+        // Get the row that was clicked
+        let userRow = document.querySelector(`#usersTable tbody tr:nth-child(${userId})`);
+        
+        // Extract user data from the table row
+        let id = userRow.cells[0].textContent.trim();
+        let username = userRow.cells[1].textContent.trim();
+        let passwordStatus = userRow.cells[2].innerHTML.trim();
+        let created = userRow.cells[3].textContent.trim();
+        let updated = userRow.cells[4].textContent.trim();
+        
+        // Update the modal content
         let userDetailContent = document.getElementById('userDetailContent');
         userDetailContent.innerHTML = `
             <div class="text-center mb-3">
@@ -224,25 +244,25 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered">
-                    <tr>
-                        <th>User ID</th>
-                        <td>${userId}</td>
+                    <tr class="bg-light">
+                        <th class="text-dark">User ID</th>
+                        <td class="text-dark">${id}</td>
                     </tr>
                     <tr>
-                        <th>Username</th>
-                        <td>${document.querySelector(`tr:nth-child(${userId}) td:nth-child(2)`).textContent}</td>
+                        <th class="text-dark">Username</th>
+                        <td class="text-dark">${username}</td>
+                    </tr>
+                    <tr class="bg-light">
+                        <th class="text-dark">Password Status</th>
+                        <td class="text-dark">${passwordStatus}</td>
                     </tr>
                     <tr>
-                        <th>Password Status</th>
-                        <td>${document.querySelector(`tr:nth-child(${userId}) td:nth-child(3)`).innerHTML}</td>
+                        <th class="text-dark">Created</th>
+                        <td class="text-dark">${created}</td>
                     </tr>
-                    <tr>
-                        <th>Created</th>
-                        <td>${document.querySelector(`tr:nth-child(${userId}) td:nth-child(4)`).textContent}</td>
-                    </tr>
-                    <tr>
-                        <th>Last Updated</th>
-                        <td>${document.querySelector(`tr:nth-child(${userId}) td:nth-child(5)`).textContent}</td>
+                    <tr class="bg-light">
+                        <th class="text-dark">Last Updated</th>
+                        <td class="text-dark">${updated}</td>
                     </tr>
                 </table>
             </div>
@@ -257,6 +277,30 @@
         if (confirm('Are you sure you want to reset this user\'s password to the default "Changepass123"?')) {
             // In a real app, this would make an AJAX call to reset the password
             alert('Password has been reset to "Changepass123". The user will be prompted to change it on next login.');
+        }
+    }
+    
+    function deleteUser(userId) {
+        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            // Create a form and submit it to delete the user
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/users/' + userId;
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            
+            const methodField = document.createElement('input');
+            methodField.type = 'hidden';
+            methodField.name = '_method';
+            methodField.value = 'DELETE';
+            
+            form.appendChild(csrfToken);
+            form.appendChild(methodField);
+            document.body.appendChild(form);
+            form.submit();
         }
     }
 </script>

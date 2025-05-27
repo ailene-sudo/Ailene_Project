@@ -231,15 +231,7 @@
                     </div>
                 </form>
                 
-                <div class="or-divider">
-                    <span>OR</span>
-                </div>
-                
-                <div class="d-grid">
-                    <a href="{{ route('register') }}" class="btn btn-outline-success">
-                        <i class="bi bi-person-plus"></i> Register New Account
-                    </a>
-                </div>
+
                 
                 <div class="links">
                     <p class="mb-0 text-muted">

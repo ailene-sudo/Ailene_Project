@@ -1,6 +1,6 @@
 @extends('layout')
 
-@section('title', 'Create User Account')
+@section('title', 'Edit User Account')
 
 @section('content')
 <div class="container py-5">
@@ -8,7 +8,7 @@
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
-                    <h4 class="mb-0"><i class="bi bi-person-plus"></i> Create User Account</h4>
+                    <h4 class="mb-0"><i class="bi bi-person-gear"></i> Edit User Account</h4>
                     <a href="{{ route('admin.users') }}" class="btn btn-sm btn-outline-light">
                         <i class="bi bi-arrow-left"></i> Back to Users
                     </a>
@@ -21,12 +21,9 @@
                         </div>
                     @endif
                     
-                    <div class="alert alert-info mb-4">
-                        <strong><i class="bi bi-info-circle"></i> Note:</strong> New users will receive the default password "Changepass123" and will be required to change it upon first login.
-                    </div>
-                    
-                    <form method="POST" action="{{ route('admin.users.store') }}" class="needs-validation" novalidate>
+                    <form method="POST" action="{{ route('admin.users.update', $user->id) }}" class="needs-validation" novalidate>
                         @csrf
+                        @method('PUT')
                         
                         <div class="row">
                             <!-- Left Column -->
@@ -38,31 +35,29 @@
                                             <i class="bi bi-person"></i>
                                         </span>
                                         <input type="text" class="form-control @error('username') is-invalid @enderror" 
-                                            id="username" name="username" value="{{ old('username') }}" 
+                                            id="username" name="username" value="{{ old('username', $user->username) }}" 
                                             pattern=".{4,50}" title="Username must be between 4 and 50 characters" 
-                                            maxlength="50" required autofocus>
+                                            maxlength="50" required>
                                         @error('username')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
                                         @enderror
                                     </div>
-                                    <div class="form-text">
-                                        <ul class="mb-0 ps-3 small">
-                                            <li>Username must be at least 4 characters</li>
-                                            <li>Must be unique in the system</li>
-                                            <li>Will be used for login credentials</li>
-                                            <li>Will also be used as email in student record</li>
-                                        </ul>
-                                    </div>
                                 </div>
                                 
                                 <div class="mb-4">
                                     <div class="card bg-light">
                                         <div class="card-body">
-                                            <h6 class="card-title"><i class="bi bi-key"></i> Default Password</h6>
-                                            <p class="card-text text-muted mb-0">
-                                                The user will be assigned the password: <strong>Changepass123</strong>
+                                            <h6 class="card-title"><i class="bi bi-shield-lock"></i> Password Status</h6>
+                                            <p class="card-text mb-0">
+                                                @if($user->defaultpassword)
+                                                    <span class="badge bg-warning text-dark">Default Password</span>
+                                                    User has not changed their default password.
+                                                @else
+                                                    <span class="badge bg-success">Custom Password</span>
+                                                    User has set a custom password.
+                                                @endif
                                             </p>
                                         </div>
                                     </div>
@@ -78,7 +73,7 @@
                                             <i class="bi bi-person-badge"></i>
                                         </span>
                                         <input type="text" class="form-control @error('fname') is-invalid @enderror" 
-                                            id="fname" name="fname" value="{{ old('fname') }}" required>
+                                            id="fname" name="fname" value="{{ old('fname', $student->fname ?? '') }}" required>
                                         @error('fname')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -94,7 +89,7 @@
                                             <i class="bi bi-person-badge"></i>
                                         </span>
                                         <input type="text" class="form-control @error('lname') is-invalid @enderror" 
-                                            id="lname" name="lname" value="{{ old('lname') }}" required>
+                                            id="lname" name="lname" value="{{ old('lname', $student->lname ?? '') }}" required>
                                         @error('lname')
                                             <div class="invalid-feedback">
                                                 {{ $message }}
@@ -107,11 +102,11 @@
                         
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary py-2">
-                                <i class="bi bi-person-plus-fill"></i> Create User Account
+                                <i class="bi bi-save"></i> Update User Account
                             </button>
-                            <button type="reset" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-counterclockwise"></i> Reset Form
-                            </button>
+                            <a href="{{ route('admin.users') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -121,14 +116,12 @@
 </div>
 
 <script>
-// Example starter JavaScript for disabling form submissions if there are invalid fields
+// Form validation
 (function () {
   'use strict'
 
-  // Fetch all the forms we want to apply custom Bootstrap validation styles to
   var forms = document.querySelectorAll('.needs-validation')
 
-  // Loop over them and prevent submission
   Array.prototype.slice.call(forms)
     .forEach(function (form) {
       form.addEventListener('submit', function (event) {

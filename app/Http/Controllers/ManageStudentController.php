@@ -188,7 +188,17 @@ class ManageStudentController extends Controller
         }
 
         // Update the student with new data
-        $student->update($request->except('image'));
+        $student->studentid = $request->studentid;
+        $student->fname = $request->fname;
+        $student->mname = $request->mname;
+        $student->lname = $request->lname;
+        $student->address = $request->address;
+        $student->contactno = $request->contactno;
+        $student->email = $request->email;
+        if (isset($request->image_path)) {
+            $student->image_path = $request->image_path;
+        }
+        $student->save();
 
         // Log changes
         if (!empty($changes)) {
