@@ -18,5 +18,14 @@ class Student extends Model
         'contactno',
         'image_path',
         'email',
+        'status'
     ];
+
+    /**
+     * Get the user account associated with the student.
+     */
+    public function userAccount()
+    {
+        return $this->hasOne(UserAccount::class, 'username', 'email');
+    }
 }

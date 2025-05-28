@@ -90,6 +90,7 @@ class ManageStudentController extends Controller
             $student->contactno = $request->contactno;
             $student->email = $request->email;
             $student->image_path = $imagePath;
+            $student->status = 'active'; // Set default status
             $student->save();
 
             // Generate default password (Studentid + first_name)
@@ -101,7 +102,8 @@ class ManageStudentController extends Controller
             $userAccount->password = Hash::make($defaultPassword);
             $userAccount->defaultpassword = true;
             $userAccount->role = 'student';
-            $userAccount->status = 'active';
+            $userAccount->status = 'active'; // Set default status
+            $userAccount->user_account_id = $studentId;
             $userAccount->save();
 
             // Log the newly created student and user account
@@ -200,6 +202,10 @@ class ManageStudentController extends Controller
         }
         $student->save();
 
+        // Update the user account ID
+        UserAccount::where('username', $request->email)
+            ->update(['user_account_id' => $request->studentid]);
+
         // Log changes
         if (!empty($changes)) {
             Log::info("Student: {$student->studentid} is updated with the following changes: " . implode(', ', $changes));
@@ -229,5 +235,42 @@ class ManageStudentController extends Controller
 
         // Redirect to index with success message
         return redirect()->route('students.index')->with('message', 'Student Successfully Deleted!');
+    }
+
+    /**
+     * Toggle student status between active and inactive
+     */
+    public function toggleStatus(Student $student)
+    {
+        // Check if user is admin
+        if (session('role') !== 'admin') {
+            return redirect()->route('students.index')
+                ->with('error', 'Only administrators can change student status.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Toggle the status
+            $newStatus = $student->status === 'active' ? 'inactive' : 'active';
+            
+            // Update student status
+            $student->status = $newStatus;
+            $student->save();
+
+            // Update associated user account status
+            UserAccount::where('username', $student->email)
+                ->update(['status' => $newStatus]);
+
+            DB::commit();
+
+            return redirect()->route('students.index')
+                ->with('message', "Student status has been updated to " . ucfirst($newStatus));
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error("Error toggling student status: " . $e->getMessage());
+            
+            return redirect()->route('students.index')
+                ->with('error', 'An error occurred while updating the student status.');
+        }
     }
 }

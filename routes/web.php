@@ -75,4 +75,5 @@ Route::middleware([SessionUserAccountMW::class])->group(function () {
 
     // Student CRUD routes
     Route::resource('/students', ManageStudentController::class);
+    Route::patch('/students/{student}/toggle-status', [ManageStudentController::class, 'toggleStatus'])->name('students.toggle-status');
 });

@@ -44,6 +44,7 @@
                             <th class="py-3">Address</th>
                             <th class="py-3">Contact No</th>
                             <th class="py-3">Email</th>
+                            <th class="py-3">Status</th>
                             <th class="py-3">Actions</th>
                         </tr>
                     </thead>
@@ -72,6 +73,21 @@
                                 <td class="align-middle">{{ $student->address }}</td>
                                 <td class="align-middle">{{ $student->contactno }}</td>
                                 <td class="align-middle">{{ $student->email }}</td>
+                                <td class="align-middle">
+                                    @if(session('role') === 'admin')
+                                        <form action="{{ route('students.toggle-status', $student->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-sm {{ $student->status === 'active' ? 'btn-success' : 'btn-danger' }}">
+                                                {{ ucfirst($student->status) }}
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="badge {{ $student->status === 'active' ? 'bg-success' : 'bg-danger' }}">
+                                            {{ ucfirst($student->status) }}
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="align-middle">
                                     <div class="btn-group" role="group">
                                         <a href="{{ route('students.show', $student->id) }}" 

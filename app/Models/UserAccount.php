@@ -17,7 +17,8 @@ class UserAccount extends Model
         'defaultpassword',
         'role',
         'status',
-        'last_login'
+        'last_login',
+        'user_account_id'
     ];
     
     protected $hidden = [
@@ -28,4 +29,18 @@ class UserAccount extends Model
         'defaultpassword' => 'boolean',
         'last_login' => 'datetime',
     ];
+
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = true;
 }

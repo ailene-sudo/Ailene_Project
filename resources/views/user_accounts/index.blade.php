@@ -106,6 +106,7 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th>ID</th>
+                                        <th>User Account ID</th>
                                         <th>Username</th>
                                         <th>Password Status</th>
                                         <th>Created</th>
@@ -117,6 +118,13 @@
                                     @foreach($users as $user)
                                         <tr class="user-row {{ $user->defaultpassword ? 'default-password' : 'custom-password' }}">
                                             <td>{{ $user->id }}</td>
+                                            <td>
+                                                @if($user->user_account_id)
+                                                    <span class="badge bg-success">{{ $user->user_account_id }}</span>
+                                                @else
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 <strong>{{ $user->username }}</strong>
                                             </td>
@@ -192,7 +200,7 @@
         let tableRows = document.querySelectorAll('#usersTable tbody tr');
         
         tableRows.forEach(row => {
-            let username = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            let username = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
             if (username.includes(searchText)) {
                 row.style.display = '';
             } else {
@@ -231,10 +239,10 @@
         
         // Extract user data from the table row
         let id = userRow.cells[0].textContent.trim();
-        let username = userRow.cells[1].textContent.trim();
-        let passwordStatus = userRow.cells[2].innerHTML.trim();
-        let created = userRow.cells[3].textContent.trim();
-        let updated = userRow.cells[4].textContent.trim();
+        let username = userRow.cells[2].textContent.trim();
+        let passwordStatus = userRow.cells[3].innerHTML.trim();
+        let created = userRow.cells[4].textContent.trim();
+        let updated = userRow.cells[5].textContent.trim();
         
         // Update the modal content
         let userDetailContent = document.getElementById('userDetailContent');

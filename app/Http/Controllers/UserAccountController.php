@@ -84,13 +84,6 @@ class UserAccountController extends Controller
         // Use fixed default password "changepass123"
         $defaultPassword = "changepass123";
 
-        // Create the user with a hashed password
-        UserAccount::create([
-            'username' => $request->username,
-            'password' => Hash::make($defaultPassword),
-            'defaultpassword' => true,
-        ]);
-        
         // Generate a student ID (S-YY-sequence)
         $year = date('y'); // Current year (2 digits)
         $latestStudent = Student::where('studentid', 'like', "S-{$year}-%")
@@ -106,6 +99,14 @@ class UserAccountController extends Controller
         }
         
         $studentId = "S-{$year}-{$sequence}";
+        
+        // Create the user with a hashed password
+        UserAccount::create([
+            'username' => $request->username,
+            'password' => Hash::make($defaultPassword),
+            'defaultpassword' => true,
+            'user_account_id' => $studentId
+        ]);
         
         // Create a corresponding student record
         Student::create([
@@ -165,6 +166,10 @@ class UserAccountController extends Controller
             $student->lname = $request->lname;
             $student->email = $request->username;
             $student->save();
+            
+            // Update user_account_id to match studentid
+            $user->user_account_id = $student->studentid;
+            $user->save();
         }
         
         return redirect()->route('admin.users')
@@ -224,38 +229,41 @@ class UserAccountController extends Controller
         if (!$user) {
             Log::info("Login failed: User not found - " . $request->username);
             return back()
-                ->with('error', 'No account found with this username')
-                ->withInput($request->except('password'));
+                ->withInput()
+                ->withErrors(['username' => 'Invalid username or password']);
         }
 
         if (!Hash::check($request->password, $user->password)) {
             Log::info("Login failed: Invalid password for user - " . $request->username);
             return back()
-                ->with('error', 'Invalid password. For student accounts, remember to use your Student ID followed by a hyphen and your first name (e.g., S-24-1-John)')
-                ->withInput($request->except('password'));
+                ->withInput()
+                ->withErrors(['password' => 'Invalid username or password']);
         }
 
-        // Store username and last activity timestamp in session
+        // Update last login timestamp
+        try {
+            $user->last_login = Carbon::now();
+            $user->save();
+        } catch (\Exception $e) {
+            Log::error("Error updating last login time: " . $e->getMessage());
+            // Continue with login even if updating timestamp fails
+        }
+
+        // Set session
         session([
             'username' => $user->username,
             'last_activity' => Carbon::now()
         ]);
 
-        // Update last login timestamp
-        $user->update([
-            'last_login' => Carbon::now()
-        ]);
+        Log::info("Login successful for user: " . $request->username);
 
-        Log::info("Login successful for user: " . $user->username);
-
-        // If user has default password, redirect to update password page
+        // If user has default password, redirect to password update page
         if ($user->defaultpassword) {
             return redirect()->route('password.update')
-                ->with('warning', 'You must update your default password before proceeding');
+                ->with('warning', 'Please update your password to continue.');
         }
 
-        return redirect()->route('dashboard')
-            ->with('success', 'Login successful! Welcome back.');
+        return redirect()->route('dashboard');
     }
 
     /**
@@ -263,21 +271,23 @@ class UserAccountController extends Controller
      */
     public function showUpdatePasswordForm()
     {
-        // Ensure session is valid
         if (!session()->has('username')) {
-            return redirect()->route('login')
-                ->with('error', 'Your session has expired. Please log in again.');
+            return redirect()->route('login');
         }
-        
-        // Get the user to check if they have a default password
+
         $username = session('username');
         $user = UserAccount::where('username', $username)->first();
         
+        if (!$user) {
+            session()->flush();
+            return redirect()->route('login');
+        }
+
         $isDefaultPassword = $user->defaultpassword;
+        $userRole = $user->role;
         
-        // Check if this is a student account by looking up the email in students table
+        // Get associated student record if it exists
         $student = Student::where('email', $username)->first();
-        $userRole = $student ? 'student' : 'user';
         
         // Set the default password based on user role
         $defaultPassword = null;
@@ -366,10 +376,9 @@ class UserAccountController extends Controller
      */
     public function logout()
     {
-        // Clear all session data
+        $username = session('username');
         session()->flush();
-        
-        return redirect()->route('login')
-            ->with('success', 'You have been logged out successfully');
+        Log::info("User logged out: " . $username);
+        return redirect()->route('login');
     }
 }
