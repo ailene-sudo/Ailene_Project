@@ -197,6 +197,9 @@ class UserAccountController extends Controller
      */
     public function showLoginForm()
     {
+        if (session()->has('username')) {
+            return redirect()->route('dashboard');
+        }
         return view('user_accounts.login');
     }
 

@@ -12,9 +12,9 @@ Route::get('/login', [UserAccountController::class, 'showLoginForm'])->name('log
 Route::post('/login', [UserAccountController::class, 'login'])->name('login.submit');
 Route::get('/logout', [UserAccountController::class, 'logout'])->name('logout');
 
-// Redirect root to login
+// Show welcome page at root
 Route::get('/', function () {
-    return redirect()->route('login');
+    return view('welcome');
 });
 
 // Registration Routes moved to protected routes
